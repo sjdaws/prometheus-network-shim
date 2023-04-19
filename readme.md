@@ -40,14 +40,14 @@ Hosts must have the following tools available:
 - nsenter
 - ethtool
 
-You will also need to remap the original cadvisor `container_network_*` metrics to `network:container_network_*`. A remapping to do this [is supplied](https://github.com/sjdaws/prometheus-network-metrics/blob/main/install/kubernetes/prometheus-cadvisor-relabel.yaml) in the install folder.
+You will also need to remap the original cadvisor `container_network_*` metrics to `network:container_network_*`. A remapping to do this [is supplied](https://github.com/sjdaws/prometheus-network-shim/blob/main/install/kubernetes/prometheus-cadvisor-relabel.yaml) in the install folder.
 
 ### Installation
 
 Two manifests are supplied in the install folder.
 
-- [prometheus-network-shim](https://github.com/sjdaws/prometheus-network-metrics/blob/main/install/kubernetes/prometheus-network-shim.yaml) will install the shim as a DaemonSet, create a ClusterRole/Binding, and a ServiceMonitor
-- [prometheus-rules](https://github.com/sjdaws/prometheus-network-metrics/blob/main/install/kubernetes/prometheus-rules.yaml) will join the cadvisor `network:container_network_*` with the shim to create `container_network_*` metrics
+- [prometheus-network-shim](https://github.com/sjdaws/prometheus-network-shim/blob/main/install/kubernetes/prometheus-network-shim.yaml) will install the shim as a DaemonSet, create a ClusterRole/Binding, and a ServiceMonitor
+- [prometheus-rules](https://github.com/sjdaws/prometheus-network-shim/blob/main/install/kubernetes/prometheus-rules.yaml) will join the cadvisor `network:container_network_*` with the shim to create `container_network_*` metrics
 
 These manifests are mapped to the `monitoring` namespace, this can be changed to any namespace you desire.
 

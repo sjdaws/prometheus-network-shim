@@ -1,6 +1,6 @@
 # Prometheus Network Shim
 
-This package creates a shim to fill in the pod name for prometheus network metrics when using a container runtime with virtual interfaces. This should be used when the metrics call returns empty pod names.
+This package creates a shim to fill in the prometheus pod network metrics when using a container runtime with virtual interfaces. This should be used when the metrics call returns empty pod details.
 
 ```shell
 kubectl get --raw /api/v1/nodes/NODE/proxy/metrics/cadvisor | grep 'container_network_transmit_bytes_total'

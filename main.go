@@ -16,7 +16,7 @@ var build = "develop"
 
 func main() {
 	klog.InitFlags(nil)
-	klog.Info("Version:", build)
+	klog.Info("Version: ", build)
 
 	config, err := parseFlags()
 	if err != nil {

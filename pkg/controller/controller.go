@@ -158,16 +158,16 @@ func (c *Controller) podHandler(key string) error {
 	}
 
 	if podSpec.HostNetwork {
-		klog.Warningf("Not mapping pod %s to interfaces %v as this is a host interface", podSpec.Name, podSpec.Interfaces)
-		metrics.DeleteAllForPod(podSpec.Name, podSpec.Namespace)
+		klog.Warningf("Not mapping pod %s to interfaces %v as this pod is using host network", podSpec.Pod, podSpec.Interfaces)
+		metrics.DeleteAllForPod(podSpec.Pod, podSpec.Namespace)
 		return nil
 	}
 
 	// As an interface might have been removed from the pod (or changed)
 	// and eventually re-add them, as the chance of having the networks changed is
 	// pretty low
-	klog.Infof("Mapping pod %s to interfaces %v", podSpec.Name, podSpec.Interfaces)
-	metrics.DeleteAllForPod(podSpec.Name, podSpec.Namespace)
+	klog.Infof("Mapping pod %s to interfaces %v", podSpec.Pod, podSpec.Interfaces)
+	metrics.DeleteAllForPod(podSpec.Pod, podSpec.Namespace)
 	metrics.UpdateForPod(podSpec)
 
 	return nil

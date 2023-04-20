@@ -87,7 +87,7 @@ func UpdateForPod(podSpec *runtimes.PodSpec) {
 
 	mtx.Lock()
 	defer mtx.Unlock()
-	podSpecs[podKey{podSpec.Name, podSpec.Namespace}] = podSpec
+	podSpecs[podKey{podSpec.Pod, podSpec.Namespace}] = podSpec
 }
 
 // createPodSpecLabels create the labels for prometheus from podSpec

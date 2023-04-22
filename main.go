@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/openshift/network-metrics-daemon/pkg/signals"
 	"github.com/sjdaws/prometheus-network-shim/pkg/controller"
 	"github.com/sjdaws/prometheus-network-shim/pkg/core"
@@ -22,7 +20,7 @@ func main() {
 	if err != nil {
 		klog.Fatalf("Unable to parse flags: %v", err)
 	}
-	klog.Info(fmt.Sprintf("Starting with config: %+v", config))
+	klog.Infof("Starting with config: %+v", config)
 
 	// Create clients
 	api, err := core.New(config.kubeConfig, config.masterURL)

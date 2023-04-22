@@ -152,7 +152,7 @@ func (c *Controller) podHandler(key string) error {
 
 	klog.Infof("Received pod: %s", pod.Name)
 
-	podSpec, err := c.crictl.GetPodSpec(pod.Spec.NodeName, pod.GetUID())
+	podSpec, err := c.crictl.GetPodSpec(pod)
 	if err != nil {
 		return err
 	}

@@ -5,13 +5,14 @@ import (
 	"errors"
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
 	runtimev1 "k8s.io/cri-api/pkg/apis/runtime/v1"
 )
 
 // getContainerSpec calls inspect via crictl
-func (c *Cri) getContainerSpec(podSandboxID string) (*runtimev1.ContainerStatusResponse, error) {
+func (c *Cri) getContainerSpec(pod *corev1.Pod, ps *runtimev1.PodSandboxStatusResponse) (*runtimev1.ContainerStatusResponse, error) {
 	filter := &runtimev1.ContainerStatsFilter{
-		PodSandboxId: podSandboxID,
+		PodSandboxId: ps.GetStatus().GetId(),
 	}
 	stats, err := c.runtimeService.ListContainerStats(context.TODO(), filter)
 	if err != nil {
@@ -20,7 +21,11 @@ func (c *Cri) getContainerSpec(podSandboxID string) (*runtimev1.ContainerStatusR
 
 	// There should be exactly one stat from the filter
 	if len(stats) != 1 {
-		return nil, errors.New(fmt.Sprintf("container stats returned for %s should be 1, but got %d", podSandboxID, len(stats)))
+		message := fmt.Sprintf("container stats returned should be 1, but got %d", len(stats))
+		if len(stats) == 0 {
+			message = fmt.Sprintf("%s - might be terminated/completed (phase: %s)", message, pod.Status.Phase)
+		}
+		return nil, errors.New(message)
 	}
 
 	cs, err := c.runtimeService.ContainerStatus(context.TODO(), stats[0].GetAttributes().GetId(), true)

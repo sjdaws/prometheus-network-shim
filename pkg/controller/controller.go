@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/sjdaws/prometheus-network-shim/pkg/cri"
 	"github.com/sjdaws/prometheus-network-shim/pkg/metrics"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
@@ -57,12 +58,12 @@ func New(crictl *cri.Cri, nodeName string, kubeclientset kubernetes.Interface, i
 			if !ok {
 				tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 				if !ok {
-					runtime.HandleError(fmt.Errorf("couldn't get object from tombstone: %+v", obj))
+					runtime.HandleError(errors.New(fmt.Sprintf("couldn't get object from tombstone: %+v", obj)))
 					return
 				}
 				pod, ok = tombstone.Obj.(*corev1.Pod)
 				if !ok {
-					runtime.HandleError(fmt.Errorf("tombstone contained object that is not an RC: %#v", obj))
+					runtime.HandleError(errors.New(fmt.Sprintf("tombstone contained object that is not an RC: %#v", obj)))
 					return
 				}
 			}
@@ -93,7 +94,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	// Wait for the caches to be synced before starting workers
 	klog.Info("Waiting for informer caches to sync")
 	if ok := cache.WaitForCacheSync(stopCh, c.podsSynced); !ok {
-		return fmt.Errorf("failed to wait for caches to sync")
+		return errors.New("failed to wait for caches to sync")
 	}
 
 	klog.Info("Starting workers")
@@ -126,13 +127,13 @@ func (c *Controller) podHandler(key string) error {
 	// Convert the namespace/name string into a distinct namespace and name
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
-		runtime.HandleError(fmt.Errorf("invalid resource key: %s", key))
+		runtime.HandleError(errors.New(fmt.Sprintf("invalid resource key: %s", key)))
 		return nil
 	}
 	obj, exists, err := c.indexer.GetByKey(key)
 	// Get the Pod resource with this namespace/name
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			metrics.DeleteAllForPod(name, namespace)
 			return nil
 		}
@@ -146,7 +147,7 @@ func (c *Controller) podHandler(key string) error {
 
 	pod, ok := obj.(*corev1.Pod)
 	if !ok {
-		runtime.HandleError(fmt.Errorf("invalid object for key: %s", key))
+		runtime.HandleError(errors.New(fmt.Sprintf("invalid object for key: %s", key)))
 		return nil
 	}
 
@@ -189,12 +190,13 @@ func (c *Controller) processNextWorkItem() bool {
 		var ok bool
 		if key, ok = obj.(string); !ok {
 			c.workqueue.Forget(obj)
-			runtime.HandleError(fmt.Errorf("expected string in workqueue but got %#v", obj))
+			runtime.HandleError(errors.New(fmt.Sprintf("expected string in workqueue but got %#v", obj)))
 			return nil
 		}
 		if err := c.podHandler(key); err != nil {
 			c.workqueue.AddRateLimited(key)
-			return fmt.Errorf("error syncing %s: %v, requeuing", key, err)
+
+			return errors.New(fmt.Sprintf("error syncing %s: %v, requeuing", key, err))
 		}
 
 		c.workqueue.Forget(obj)

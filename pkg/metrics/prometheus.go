@@ -54,7 +54,7 @@ func Serve(metricsAddress string, stopCh <-chan struct{}) {
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write([]byte(http.StatusText(http.StatusOK)))
 		if err != nil {
-			klog.Error("Error writing health check response", err)
+			klog.Fatalf("Error writing health check response: %v", err)
 		}
 	})
 
@@ -63,7 +63,7 @@ func Serve(metricsAddress string, stopCh <-chan struct{}) {
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil {
-			klog.Error("Failed serving network metrics", err)
+			klog.Fatalf("Failed serving network metrics: %v", err)
 		}
 	}()
 

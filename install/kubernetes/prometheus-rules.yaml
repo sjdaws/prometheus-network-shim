@@ -10,21 +10,21 @@ metadata:
   namespace: monitoring
 spec:
   groups:
-  - name: pod_network_shim
-    rules:
-    - record: container_network_receive_bytes_total
-      expr: network:container_network_receive_bytes_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_receive_errors_total
-      expr: network:container_network_receive_errors_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_receive_packets_total
-      expr: network:container_network_receive_packets_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_receive_packets_dropped_total
-      expr: network:container_network_receive_packets_dropped_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_transmit_bytes_total
-      expr: network:container_network_transmit_bytes_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_transmit_errors_total
-      expr: network:container_network_transmit_errors_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_transmit_packets_total
-      expr: network:container_network_transmit_packets_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
-    - record: container_network_transmit_packets_dropped_total
-      expr: network:container_network_transmit_packets_dropped_total + on(interface) group_left(container, id, image, name, namespace, pod) pod_interface_shim
+    - name: pod_network_shim
+      rules:
+        - record: container_network_receive_bytes_total
+          expr: network:container_network_receive_bytes_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_receive_errors_total
+          expr: network:container_network_receive_errors_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_receive_packets_total
+          expr: network:container_network_receive_packets_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_receive_packets_dropped_total
+          expr: network:container_network_receive_packets_dropped_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_transmit_bytes_total
+          expr: network:container_network_transmit_bytes_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_transmit_errors_total
+          expr: network:container_network_transmit_errors_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_transmit_packets_total
+          expr: network:container_network_transmit_packets_total + on(interface, node) group_right pod_interface_shim
+        - record: container_network_transmit_packets_dropped_total
+          expr: network:container_network_transmit_packets_dropped_total + on(interface, node) group_right pod_interface_shim

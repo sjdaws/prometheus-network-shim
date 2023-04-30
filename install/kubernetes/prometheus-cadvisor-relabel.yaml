@@ -1,15 +1,10 @@
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: kube-prometheus-stack-kubelet
-spec:
-  endpoints:
-  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-    honorLabels: true
-    metricRelabelings:
+---
+kubelet:
+  serviceMonitor:
+    cAdvisorMetricRelabelings:
     - action: replace
       regex: container_networks_(.+)
       replacement: network:container_network_$1
       sourceLabels:
-        - __name__
+      - __name__
       targetLabel: __name__
